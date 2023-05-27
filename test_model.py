@@ -30,7 +30,7 @@ def split_data(dataset):
 
     return total_value, label
 
-test_xy = pd.read_csv('test_data.csv')
+test_xy = pd.read_csv('test_data1.csv')
 x_test, y_test = split_data(test_xy)
 print(x_test[0])
 print(x_test.shape)

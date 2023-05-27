@@ -43,20 +43,20 @@ x_test, y_test = split_data(test_xy)
 model = keras.models.Sequential()
 model.add(keras.layers.Dense(300, input_dim=120, activation="relu"))
 model.add(keras.layers.Dense(100, activation="relu"))
-model.add(keras.layers.Dense(7, activation="softmax"))
+model.add(keras.layers.Dense(8, activation="softmax"))
 
 model.summary()
 
 model.compile(loss="sparse_categorical_crossentropy",
-              optimizer="sgd",
+              optimizer="adam",
               metrics=["accuracy"])
 
 history = model.fit(x_train, y_train, epochs=30, batch_size=1)
 
-# pd.DataFrame(history.history).plot(figsize=(8, 5))
-# plt.grid(True)
-# plt.gca().set_ylim(0, 1)
-# plt.show()
+pd.DataFrame(history.history).plot(figsize=(8, 5))
+plt.grid(True)
+plt.gca().set_ylim(0, 1)
+plt.show()
 
 #모델 평가
 model.evaluate(x_test, y_test)
