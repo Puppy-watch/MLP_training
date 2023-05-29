@@ -34,8 +34,8 @@ def split_data(dataset):
 
     return total_value, label
 
-train_xy = pd.read_csv('./data/train_data.csv')
-test_xy = pd.read_csv('./data/test_data.csv')
+train_xy = pd.read_csv('./data/train_data_ddu_plus.csv')
+test_xy = pd.read_csv('./data/test_data_ddu_plus.csv')
 
 x_train, y_train = split_data(train_xy)
 x_test, y_test = split_data(test_xy)
@@ -43,7 +43,8 @@ x_test, y_test = split_data(test_xy)
 model = keras.models.Sequential()
 model.add(keras.layers.Dense(400, input_dim=120, activation="relu"))
 model.add(keras.layers.Dense(150, activation="relu"))
-model.add(keras.layers.Dense(7, activation="softmax"))
+model.add(keras.layers.Dense(50, activation="relu"))
+model.add(keras.layers.Dense(8, activation="softmax"))
 
 model.summary()
 
@@ -57,7 +58,7 @@ plt.figure(figsize=(12,4))
 plt.subplot(1, 2, 1)
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
-plt.title('layer2 model accuracy')
+plt.title('layer3 model accuracy')
 plt.xlabel('epoch')
 plt.ylabel('accuracy')
 plt.legend(['train', 'validation'])
@@ -65,7 +66,7 @@ plt.legend(['train', 'validation'])
 plt.subplot(1, 2, 2)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
-plt.title('layer2 model loss')
+plt.title('layer3 model loss')
 plt.xlabel('epoch')
 plt.ylabel('loss')
 plt.legend(['train', 'validation'])
@@ -81,5 +82,5 @@ y_proba.round(2)
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 tflite_model = converter.convert()
 
-with open('./model/ddu_ip_layer2.tflite', 'wb') as f:
+with open('./model/ddu_plus_layer3.tflite', 'wb') as f:
   f.write(tflite_model)

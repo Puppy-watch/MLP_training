@@ -36,7 +36,7 @@ print(x_test[0])
 print(x_test.shape)
 
 # Load the TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="model/ddu_plus_layer2.tflite")
+interpreter = tf.lite.Interpreter(model_path="model/ddu_plus_layer3.tflite")
 interpreter.allocate_tensors()
 
 # Get input and output tensors.

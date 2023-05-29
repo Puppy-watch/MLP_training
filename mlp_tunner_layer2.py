@@ -36,8 +36,8 @@ def split_data(dataset):
 
     return total_value, label
 
-train_xy = pd.read_csv('train_data1.csv')
-test_xy = pd.read_csv('test_data1.csv')
+train_xy = pd.read_csv('./data/train_data_ddu_plus.csv')
+test_xy = pd.read_csv('./data/test_data_ddu_plus.csv')
 
 x_train, y_train = split_data(train_xy)
 x_test, y_test = split_data(test_xy)
@@ -46,10 +46,12 @@ def model_builder(hp):
   model = keras.Sequential()
 
   # Tune the number of units in the first Dense layer
-  hp_units = hp.Int('units', min_value = 32, max_value = 1024, step = 64)
-  hp_units1 = hp.Int('units1', min_value=32, max_value=1024, step=64)
+  hp_units = hp.Int('units', min_value = 300, max_value = 1024, step = 64)
+  hp_units1 = hp.Int('units1', min_value=64, max_value=1024, step=64)
+  hp_units2 = hp.Int('units1', min_value=32, max_value=1024, step=64)
   model.add(keras.layers.Dense(input_dim = 120, units = hp_units, activation = 'relu'))
   model.add(keras.layers.Dense(units=hp_units1, activation='relu'))
+  model.add(keras.layers.Dense(units=hp_units2, activation='relu'))
   model.add(keras.layers.Dense(8, activation="softmax"))
 
   # Tune the learning rate for the optimizer
@@ -67,8 +69,8 @@ tuner = kt.Hyperband(model_builder,
                      objective = 'val_accuracy',
                      max_epochs = 500,
                      factor = 10,
-                     directory = 'my_dir2',
-                     project_name = 'intro_to_kt2')
+                     directory = 'my_dir3',
+                     project_name = 'intro_to_kt3')
 
 class ClearTrainingOutput(tf.keras.callbacks.Callback):
   def on_train_end(*args, **kwargs):
@@ -92,7 +94,7 @@ history = model.fit(x_train, y_train, validation_data=(x_test, y_test),
                         epochs=1000, batch_size=32,  verbose=1)
 
 
-model.save('tuner_all_layer2.h5')
+model.save('tuner_all_layer3.h5')
 
 (loss, accuracy) = model.evaluate(x_test, y_test, batch_size=32, verbose=1)
 print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
@@ -100,7 +102,7 @@ print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 tflite_model = converter.convert()
 
-with open('tuner_layer2.tflite', 'wb') as f:
+with open('tuner_layer3.tflite', 'wb') as f:
   f.write(tflite_model)
 
 y_pred_train = model.predict(x_train)
@@ -113,7 +115,7 @@ plt.figure(figsize=(12,4))
 plt.subplot(1, 2, 1)
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
-plt.title('model accuracy')
+plt.title('layer3 model accuracy')
 plt.xlabel('epoch')
 plt.ylabel('accuracy')
 plt.legend(['train', 'validation'])
@@ -121,7 +123,7 @@ plt.legend(['train', 'validation'])
 plt.subplot(1, 2, 2)
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
-plt.title('model loss')
+plt.title('layer3 model loss')
 plt.xlabel('epoch')
 plt.ylabel('loss')
 
