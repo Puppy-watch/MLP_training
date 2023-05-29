@@ -36,8 +36,8 @@ def split_data(dataset):
 
     return total_value, label
 
-train_xy = pd.read_csv('train_data.csv')
-test_xy = pd.read_csv('test_data.csv')
+train_xy = pd.read_csv('train_data1.csv')
+test_xy = pd.read_csv('test_data1.csv')
 
 x_train, y_train = split_data(train_xy)
 x_test, y_test = split_data(test_xy)
@@ -46,10 +46,10 @@ def model_builder(hp):
   model = keras.Sequential()
 
   # Tune the number of units in the first Dense layer
-  hp_units = hp.Int('units', min_value = 32, max_value = 1000, step = 64)
-  hp_units1 = hp.Int('units1', min_value=32, max_value=1000, step=64)
+  hp_units = hp.Int('units', min_value = 32, max_value = 1024, step = 32)
+  # hp_units1 = hp.Int('units1', min_value=32, max_value=1024, step=32)
   model.add(keras.layers.Dense(input_dim = 120, units = hp_units, activation = 'relu'))
-  model.add(keras.layers.Dense(units=hp_units1, activation='relu'))
+  # model.add(keras.layers.Dense(units=hp_units1, activation='relu'))
   model.add(keras.layers.Dense(8, activation="softmax"))
 
   # Tune the learning rate for the optimizer
@@ -65,7 +65,7 @@ def model_builder(hp):
 
 tuner = kt.Hyperband(model_builder,
                      objective = 'val_accuracy',
-                     max_epochs = 500,
+                     max_epochs = 1000,
                      factor = 10,
                      directory = 'my_dir',
                      project_name = 'intro_to_kt')
@@ -74,14 +74,14 @@ class ClearTrainingOutput(tf.keras.callbacks.Callback):
   def on_train_end(*args, **kwargs):
     IPython.display.clear_output(wait = True)
 
-tuner.search(x_train, y_train, epochs = 500, validation_data = (x_test, y_test), callbacks = [ClearTrainingOutput()])
+tuner.search(x_train, y_train, epochs = 1000, validation_data = (x_test, y_test), callbacks = [ClearTrainingOutput()])
 
 # Get the optimal hyperparameters
 best_hps = tuner.get_best_hyperparameters()[0]
 
 print(f"""
 The hyperparameter search is complete. The optimal number of units in the first densely-connected
-layer is {best_hps.get('units')}, second layer is {best_hps.get('units1')} and the optimal learning rate for the optimizer
+layer is {best_hps.get('units')} and the optimal learning rate for the optimizer
 is {best_hps.get('learning_rate')} and momentum is {best_hps.get('momentum')}.
 """)
 
@@ -97,7 +97,11 @@ model.save('tuner_all.h5')
 (loss, accuracy) = model.evaluate(x_test, y_test, batch_size=32, verbose=1)
 print("[INFO] loss={:.4f}, accuracy: {:.4f}%".format(loss, accuracy * 100))
 
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
 
+with open('tuner.tflite', 'wb') as f:
+  f.write(tflite_model)
 
 y_pred_train = model.predict(x_train)
 

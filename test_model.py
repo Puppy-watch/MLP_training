@@ -30,13 +30,13 @@ def split_data(dataset):
 
     return total_value, label
 
-test_xy = pd.read_csv('test_data1.csv')
+test_xy = pd.read_csv('./data/test_data_ddu_plus.csv')
 x_test, y_test = split_data(test_xy)
 print(x_test[0])
 print(x_test.shape)
 
 # Load the TFLite model and allocate tensors.
-interpreter = tf.lite.Interpreter(model_path="model.tflite")
+interpreter = tf.lite.Interpreter(model_path="model/ddu_plus_layer2.tflite")
 interpreter.allocate_tensors()
 
 # Get input and output tensors.
@@ -68,6 +68,7 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 cm = confusion_matrix(y_test, output_data)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(range(7)))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(range(8)))
 disp.plot(cmap=plt.cm.Blues)
 plt.show()
+
